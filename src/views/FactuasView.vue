@@ -161,8 +161,11 @@
         }
   
         // Enviar los datos directamente al hacer clic en Guardar Factura
+       /*  const respuesta = await fetch("https://script.google.com/macros/s/AKfycbwZBjhB6_Sw5VF-VRTgvnXUIyvC78qftcPFQpSH9WBBfR6asApcv3CzG2kEK2_Cppq1/exec", {
+            method: 'POST',
+            headers: { */
         try {
-          const respuesta = await fetch("https://script.google.com/macros/s/AKfycbwZBjhB6_Sw5VF-VRTgvnXUIyvC78qftcPFQpSH9WBBfR6asApcv3CzG2kEK2_Cppq1/exec", {
+          const respuesta = await fetch("https://script.google.com/macros/s/AKfycbz4_sOEPZV-BY5twQmCGOeNIVx1Aqsttr6rz2SVpj3Uk7wtDU6CTgY9r_qOUVj8W3P0/exec", {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
