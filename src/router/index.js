@@ -24,14 +24,29 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/FactuasView.vue')
   },
   {
+    path: '/domicilios',
+    name: 'domicilios', 
+    component: () => import('../views/DomicilioView.vue')
+  },
 
-  path: '/domicilio',
+{
+
+  path: '/analisis',
+  name: 'anali',
+  // route level code-splitting
+  // this generates a separate chunk (about.[hash].js) for this route
+  // which is lazy-loaded when the route is visited.
+  component: () => import(/* webpackChunkName: "about" */ '../views/AnalissView.vue')
+},
+{
+
+  path: '/listadomicilio',
   name: 'domicil',
   // route level code-splitting
   // this generates a separate chunk (about.[hash].js) for this route
   // which is lazy-loaded when the route is visited.
-  component: () => import(/* webpackChunkName: "about" */ '../views/DomicilioView.vue')
-}
+  component: () => import(/* webpackChunkName: "about" */ '../views/ListadoDomicilio.vue')
+},
 ]
 
 const router = createRouter({

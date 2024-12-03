@@ -2,14 +2,6 @@
     <div class="container mt-5">
       <h1 class="text-center mb-4 text-primary">Facturación</h1>
   
-      <!-- Checkbox de Distribuidor -->
-      <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" id="distribuidorCheck" v-model="esDistribuidor" @change="cambiarPreciosDistribuidor">
-        <label class="form-check-label" for="distribuidorCheck">
-          Soy distribuidor
-        </label>
-      </div>
-  
       <!-- Botones para Selección de Producto -->
       <h4 class="text-info">Selecciona un producto:</h4>
       <div id="productosBotones" class="mb-3">
