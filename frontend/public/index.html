@@ -1,16 +1,71 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
   <head>
+    <!-- Configuración básica -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Título del sitio -->
+    <title>IN-JOB | Encuentra tu próximo empleo</title>
+
+    <!-- Descripción para SEO -->
+    <meta name="description" content="IN-JOB es la plataforma líder para conectar empleadores con candidatos altamente calificados. Encuentra trabajo o contrata talento de manera eficiente.">
+    
+    <!-- Palabras clave -->
+    <meta name="keywords" content="empleos, trabajos, búsqueda de empleo, contratar, ofertas laborales, IN-JOB, plataforma de empleos">
+
+    <!-- Robots -->
+    <meta name="robots" content="index, follow">
+
+    <!-- Favicon -->
+<link rel="icon" href="https://cdn.leonardo.ai/users/221500d2-94a5-4943-8c5f-3d971acae818/generations/02963a25-5249-4d70-90b7-43480d06cc54/Leonardo_Phoenix_Design_a_modern_and_sleek_logo_for_Injob_a_st_0.jpg">
+
+
+    <!-- Open Graph para redes sociales -->
+    <meta property="og:title" content="IN-JOB | Encuentra tu próximo empleo">
+    <meta property="og:description" content="Descubre empleos o encuentra talento con IN-JOB, la plataforma líder en el mercado laboral.">
+    <meta property="og:image" content="<%= BASE_URL %>og-image.jpg">
+    <meta property="og:url" content="https://www.in-job.com">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="IN-JOB | Encuentra tu próximo empleo">
+    <meta name="twitter:description" content="Descubre empleos o encuentra talento con IN-JOB, la plataforma líder en el mercado laboral.">
+    <meta name="twitter:image" content="<%= BASE_URL %>twitter-image.jpg">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.in-job.com">
+
+    <!-- Datos estructurados en JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "IN-JOB",
+        "url": "https://www.in-job.com",
+        "logo": "https://www.in-job.com/logo.png",
+        "sameAs": [
+          "https://www.facebook.com/injob",
+          "https://www.twitter.com/injob",
+          "https://www.linkedin.com/company/injob"
+        ],
+        "description": "IN-JOB es la plataforma líder para conectar empleadores con candidatos altamente calificados.",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+1-800-555-0199",
+          "contactType": "customer service"
+        }
+      }
+    </script>
   </head>
   <body>
+    <!-- Mensaje para navegadores sin soporte de JavaScript -->
     <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong>Lo sentimos, pero IN-JOB no funciona correctamente sin JavaScript habilitado. Por favor, actívalo para continuar.</strong>
     </noscript>
+    
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>

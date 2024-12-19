@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg navbar-light" :style="{ backgroundColor: '#343a40', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)' }">
     <div class="container-fluid">
       <!-- Logo -->
-      <router-link style="color: aliceblue;" to="/" class="navbar-brand">Logo</router-link>
+      <router-link style="color: aliceblue;" to="/" class="navbar-brand">IN-JON</router-link>
 
       <!-- Botón para menú en dispositivos móviles -->
       <button 
