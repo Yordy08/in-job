@@ -10,6 +10,7 @@
     "express:run": "vue-cli-service express:run"
   },
   "dependencies": {
+    "animate.css": "^4.1.1",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
     "core-js": "^3.8.3",

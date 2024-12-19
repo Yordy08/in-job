@@ -1,8 +1,29 @@
 <template>
   <div class="container">
+    <AppNav />
+    <br>
+    <br>
+    <!-- Previsualizador de estado de pagos -->
+    <div class="row">
+      <div class="col-12 mb-4">
+        <div class="alert alert-info">
+          <p><strong>Total de Pagados: </strong>{{ totalPagado }}</p>
+          <p><strong>Total de Pendientes: </strong>{{ totalPendiente }}</p>
+        </div>
+      </div>
+    </div>
+
     <div class="row">
       <!-- Iteramos sobre los elementos y los mostramos en un card responsivo -->
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4" v-for="item in items" :key="item.id">
+      <div
+        class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4"
+        v-for="item in items"
+        :key="item.id"
+        :class="{
+          'bg-danger': item.estadoPago === 'Pendiente',
+          'bg-success': item.estadoPago !== 'Pendiente'
+        }"
+      >
         <div class="card">
           <img v-if="item.imagen" :src="item.imagen" class="card-img-top" alt="Imagen del producto" />
           <div class="card-body">
@@ -30,7 +51,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form @submit.prevent="updateItem">
+            <form @submit.prevent="confirmUpdate">
               <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre</label>
                 <input v-model="currentItem.nombre" type="text" class="form-control" id="nombre" required />
@@ -57,13 +78,17 @@
               </div>
               <div class="mb-3">
                 <label for="estadoPago" class="form-label">Estado de Pago</label>
-                <input v-model="currentItem.estadoPago" type="text" class="form-control" id="estadoPago" required />
+                <select v-model="currentItem.estadoPago" class="form-select" id="estadoPago" required>
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Pagado">Pagado</option>
+                </select>
               </div>
+
               <button type="submit" class="btn btn-success">Guardar cambios</button>
             </form>
             <!-- Botón Eliminar -->
-            <button @click="deleteItem(currentItem._id)" class="btn btn-danger mt-3">Eliminar</button>
-          </div>
+<!--             <button @click="deleteItem(currentItem._id)" class="btn btn-danger mt-3">Eliminar</button>
+ -->          </div>
         </div>
       </div>
     </div>
@@ -74,13 +99,29 @@
 import 'bootstrap/dist/css/bootstrap.min.css'; // Estilos CSS de Bootstrap
 import * as bootstrap from 'bootstrap'; // Importar el JavaScript de Bootstrap
 import axios from 'axios';
+import Swal from 'sweetalert2'; // Importar SweetAlert2
+import AppNav from '@/components/AppNav.vue'
 
 export default {
+  name: 'ListadoDomicilio', // Esta línea debe estar dentro del objeto `export default`
+  components: {
+    AppNav // Asegúrate de que el nombre del componente coincida con el archivo
+  },
   data() {
     return {
       items: [],
       currentItem: {} // Almacenará el ítem actual que se edita en el modal
     };
+  },
+  computed: {
+    // Computada para contar los elementos con estado 'Pendiente'
+    totalPendiente() {
+      return this.items.filter(item => item.estadoPago === 'Pendiente').length;
+    },
+    // Computada para contar los elementos con estado 'Pagado'
+    totalPagado() {
+      return this.items.filter(item => item.estadoPago === 'Pagado').length;
+    }
   },
   created() {
     this.fetchItems(); // Llamamos a la función para obtener los domicilios
@@ -88,7 +129,7 @@ export default {
   methods: {
     async fetchItems() {
       try {
-        const response = await axios.get('http://localhost:5000/domicilios'); // Reemplaza con la URL de tu API
+        const response = await axios.get('/domicilios'); // Reemplaza con la URL de tu API
         this.items = response.data;
       } catch (error) {
         console.error('Error al obtener los datos', error);
@@ -101,38 +142,71 @@ export default {
       const modal = new bootstrap.Modal(document.getElementById('crudModal'));
       modal.show();
     },
+    async confirmUpdate() {
+      // Usando SweetAlert2 para confirmar si desea guardar los cambios
+      const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¿Deseas guardar los cambios?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, guardar',
+        cancelButtonText: 'No, cancelar'
+      });
+
+      if (result.isConfirmed) {
+        this.updateItem();
+      } else {
+        console.log("Actualización cancelada por el usuario.");
+      }
+    },
     async updateItem() {
       try {
         // Llamar a la API para actualizar el domicilio
-
-        const response = await axios.put(`http://localhost:5000/domicilios/${this.currentItem._id}`, this.currentItem);
+        const response = await axios.put(`/domicilios/${this.currentItem._id}`, this.currentItem);
         this.fetchItems(); // Llamamos a la función para obtener los domicilios
 
         console.log(response.data);
 
-
-
         // Cerrar el modal
-        const modal = new bootstrap.Modal(document.getElementById('crudModal'));
+        const modal = bootstrap.Modal.getInstance(document.getElementById('crudModal'));
         modal.hide();
+
+        // Mostrar confirmación de éxito
+        Swal.fire('¡Actualizado!', 'El domicilio se ha actualizado correctamente.', 'success');
       } catch (error) {
         console.error('Error al actualizar los datos', error);
       }
     },
     async deleteItem(id) {
       try {
-        // Llamamos a la API para eliminar el domicilio
-        await axios.delete(`http://localhost:5000/domicilios/${id}`);
+        // Usando SweetAlert2 para confirmar si desea eliminar
+        const result = await Swal.fire({
+          title: '¿Estás seguro?',
+          text: "¿Deseas eliminar este domicilio?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, eliminar',
+          cancelButtonText: 'No, cancelar'
+        });
 
-        // Eliminar el item de la lista en la UI
-        //this.items = this.items.filter(item => item.id !== id);
-        this.fetchItems(); // Llamamos a la función para obtener los domicilios
+        if (result.isConfirmed) {
+          // Si el usuario confirma, llamar a la API para eliminar el domicilio
+          await axios.delete(`/domicilios/${id}`);
 
-        // Cerrar el modal
-        const modal = new bootstrap.Modal(document.getElementById('crudModal'));
-        modal.hide();
+          // Actualizar la lista de domicilios
+          this.fetchItems();
+
+          // Cerrar el modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById('crudModal'));
+          modal.hide();
+
+          // Mostrar confirmación de éxito
+          Swal.fire('¡Eliminado!', 'El domicilio ha sido eliminado correctamente.', 'success');
+        } else {
+          console.log("Eliminación cancelada por el usuario.");
+        }
       } catch (error) {
-        console.error('Error al eliminar el domicilio', error);
+        console.error("Error al eliminar el domicilio", error);
       }
     }
   }
@@ -148,5 +222,15 @@ export default {
 .card-img-top {
   height: 200px;
   object-fit: cover;
+}
+
+/* Fondo rojo tenue para 'Pendiente' */
+.bg-danger {
+  background-color: rgb(235, 118, 98); /* Rojo tenue */
+}
+
+/* Fondo verde tenue para cualquier otro estado de pago */
+.bg-success {
+  background-color: rgb(34, 139, 34); /* Verde tenue */
 }
 </style>

@@ -1,5 +1,10 @@
 <template>
+  
   <div class="container">
+    <AppNav /> <!-- Usa el componente AppNav aquí -->
+    <br>
+    <br>
+    <br>
     <h2>Formulario Dinámico de Productos</h2>
     <form @submit.prevent="guardarProductos">
       <div class="form-group">
@@ -44,13 +49,18 @@
                   class="form-control"
                   v-model.number="producto.cantidad"
                   min="1"
-                  @input="actualizarTotal(index)"
+                  @input="actualizarTotal()"
                 />
               </td>
               <td>${{ producto.precio * producto.cantidad }}</td>
             </tr>
           </tbody>
         </table>
+
+        <!-- Previsualizador de Total -->
+        <div class="mt-3">
+          <h5>Total: ${{ calcularTotal() }}</h5>
+        </div>
       </div>
 
       <button type="submit" class="btn btn-primary" :disabled="botonDeshabilitado">
@@ -61,15 +71,22 @@
 </template>
 
 <script>
+import AppNav from '@/components/AppNav.vue'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Swal from 'sweetalert2';
 import axios from 'axios';
 
 export default {
+  name: 'FactuasView', // Esta línea debe estar dentro del objeto `export default`
+  components: {
+    AppNav // Asegúrate de que el nombre del componente coincida con el archivo
+  },
   data() {
     return {
       venta: {
         fecha: '',
       },
+      
       productos: [
         { nombre: 'Avena', precio: 1000 },
         { nombre: 'Empanada de Pollo', precio: 1500 },
@@ -85,53 +102,63 @@ export default {
   },
   methods: {
     seleccionarProducto(nombre, precio) {
-      // Verifica si el producto ya está seleccionado, si no, lo agrega
       const productoExistente = this.productosSeleccionados.find(prod => prod.nombre === nombre);
       if (!productoExistente) {
         this.productosSeleccionados.push({ nombre, precio, cantidad: 1 });
       } else {
-        // Si ya está, solo se puede incrementar la cantidad
         productoExistente.cantidad++;
       }
     },
-    actualizarTotal(index) {
-      // Actualiza el total cuando se cambia la cantidad de un producto
-      const producto = this.productosSeleccionados[index];
-      producto.total = producto.precio * producto.cantidad;
+    actualizarTotal() {
+      // Actualiza automáticamente los totales
+      this.productosSeleccionados.forEach(
+        prod => (prod.total = prod.precio * prod.cantidad)
+      );
+    },
+    calcularTotal() {
+      // Calcula el total acumulado
+      return this.productosSeleccionados.reduce(
+        (total, prod) => total + prod.precio * prod.cantidad,
+        0
+      );
     },
     async guardarProductos() {
       this.botonDeshabilitado = true;
 
-      // Verificamos si todos los campos están completos
       if (!this.venta.fecha || this.productosSeleccionados.length === 0) {
-        alert('Por favor, complete todos los campos.');
+        Swal.fire('Error', 'Por favor, complete todos los campos.', 'error');
         this.botonDeshabilitado = false;
         return;
       }
 
       try {
-        // Crear los datos a enviar
-        const productosNombres = this.productosSeleccionados.map(prod => prod.nombre).join(' + ');
-        const productosPrecio = this.productosSeleccionados.reduce((total, prod) => total + (prod.precio * prod.cantidad), 0);
-        const productosCantidad = this.productosSeleccionados.reduce((total, prod) => total + prod.cantidad, 0);
+        const productosNombres = this.productosSeleccionados
+          .map(prod => prod.nombre)
+          .join(' + ');
+        const productosPrecio = this.calcularTotal();
+        const productosCantidad = this.productosSeleccionados.reduce(
+          (total, prod) => total + prod.cantidad,
+          0
+        );
 
-        // Llamada al backend con axios
-        const response = await axios.post('http://localhost:5000/facturas', {
+        await axios.post('/facturas', {
           fecha: this.venta.fecha,
           producto: productosNombres,
           precio: productosPrecio,
           cantidad: productosCantidad,
         });
 
-        console.log('Venta guardada:', response.data);
-        alert('Venta guardada correctamente');
-        
-        // Limpiar el formulario solo si se guarda correctamente
+        const horaActual = new Date().toLocaleTimeString();
+        Swal.fire(
+          'Venta Guardada',
+          `La venta fue guardada con éxito.\nTotal: $${productosPrecio}\nHora: ${horaActual}`,
+          'success'
+        );
+
         this.productosSeleccionados = [];
         this.venta.fecha = '';
       } catch (error) {
-        console.error('Error al guardar la venta:', error);
-        alert('Hubo un error al guardar la venta.');
+        Swal.fire('Error', 'Hubo un error al guardar la venta.', 'error');
       } finally {
         this.botonDeshabilitado = false;
       }
@@ -141,7 +168,6 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos CSS */
 .container {
   margin-top: 20px;
 }

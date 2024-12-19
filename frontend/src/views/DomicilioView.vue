@@ -1,5 +1,10 @@
 <template>
+  
   <div class="container">
+    <AppNav />
+    <br>
+    <br>
+
     <h2>Formulario de Domicilio</h2>
     <form @submit.prevent="guardarDomicilio">
       <div class="form-group">
@@ -74,6 +79,16 @@
           </tbody>
         </table>
       </div>
+         <center>
+          <!-- Previsualizador de la suma total -->
+      <div class="card mt-3" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">Suma Total</h5>
+          <p class="card-text">Total: ${{ sumaTotal }}</p>
+        </div>
+      </div>
+         </center>
+      
 
       <button type="submit" class="btn btn-primary" :disabled="botonDeshabilitado">
         Guardar Domicilio
@@ -83,10 +98,16 @@
 </template>
 
 <script>
+import AppNav from '@/components/AppNav.vue'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Swal from 'sweetalert2'; // Importando SweetAlert2
 import axios from 'axios';
 
 export default {
+  name: 'DomicilioView', // Esta línea debe estar dentro del objeto `export default`
+  components: {
+    AppNav // Asegúrate de que el nombre del componente coincida con el archivo
+  },
   data() {
     return {
       domicilio: {
@@ -109,6 +130,11 @@ export default {
       botonDeshabilitado: false,
     };
   },
+  computed: {
+    sumaTotal() {
+      return this.productosSeleccionados.reduce((total, producto) => total + (producto.precio * producto.cantidad), 0);
+    }
+  },
   methods: {
     seleccionarProducto(nombre, precio) {
       const productoExistente = this.productosSeleccionados.find(prod => prod.nombre === nombre);
@@ -122,43 +148,50 @@ export default {
       const producto = this.productosSeleccionados[index];
       producto.total = producto.precio * producto.cantidad;
     },
-   guardarDomicilio() {
+    guardarDomicilio() {
       this.botonDeshabilitado = true;
 
       if (!this.domicilio.fecha || !this.domicilio.nombre || !this.domicilio.direccion || !this.domicilio.telefono || this.productosSeleccionados.length === 0) {
-        alert('Por favor, complete todos los campos.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Por favor, complete todos los campos.',
+        });
         this.botonDeshabilitado = false;
         return;
       }
 
       try {
-        // Concatenamos los nombres de los productos como una cadena
         const productosNombres = this.productosSeleccionados.map(prod => prod.nombre).join(' + ');
-
-        // Calculamos el precio total y lo convertimos en cadena
         const productosPrecio = this.productosSeleccionados.reduce((total, prod) => total + (prod.precio * prod.cantidad), 0).toString();
-
-        // Calculamos la cantidad total y lo convertimos en cadena
         const productosCantidad = this.productosSeleccionados.reduce((total, prod) => total + prod.cantidad, 0).toString();
 
-         axios.post('http://localhost:5000/domicilios', {
+        axios.post('/domicilios', {
           nombre: this.domicilio.nombre,
           direccion: this.domicilio.direccion,
           telefono: this.domicilio.telefono,
           fecha: this.domicilio.fecha,
           estadoPago: this.domicilio.estadoPago,
-          producto: productosNombres, // Lo enviamos como una cadena concatenada
-          precio: productosPrecio, // Lo enviamos como cadena
-          cantidad: productosCantidad, // Lo enviamos como cadena
-        }).then((response)=>{
+          producto: productosNombres,
+          precio: productosPrecio,
+          cantidad: productosCantidad,
+        }).then((response) => {
           console.log('Domicilio guardado:', response.data);
-          alert('Domicilio guardado correctamente');
+          Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: 'Domicilio guardado correctamente',
+          });
           this.domicilio = { fecha: '', nombre: '', direccion: '', telefono: '', estadoPago: 'Pendiente' };
           this.productosSeleccionados = [];
-        })
+        });
       } catch (error) {
         console.error('Error al guardar el domicilio:', error);
-        alert('Hubo un error al guardar el domicilio.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un error al guardar el domicilio.',
+        });
       } finally {
         this.botonDeshabilitado = false;
       }

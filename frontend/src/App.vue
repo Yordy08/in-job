@@ -1,8 +1,7 @@
 <template>
  
   <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/domicilios">Domicilio</router-link>
+    
     <router-view></router-view>
   </nav>
 </template>
@@ -15,17 +14,14 @@
   text-align: center;
   color: #2c3e50;
 }
-
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
+ /* Aplicamos el fondo a todo el body */
+ body {
+    background-image: url('https://img.freepik.com/foto-gratis/hermosa-vacaciones-decoradas-habitacion-arbol-navidad-fuera-foco-fondo-foto_1253-1610.jpg?t=st=1734634832~exp=1734638432~hmac=a9f9d8bf238421968e847a8aa6329f747d78f6be6ea66d4116f24d1028e6ad19&w=826');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 100vh;
+    margin: 0;
+    color: white;
+  }
 </style>
